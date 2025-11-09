@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowUp, Trash2, ShieldAlert } from "lucide-react";
 import type { Expense } from "@/lib/types";
 import {
   Table,
@@ -14,6 +14,19 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CategoryIcon } from "@/components/category-icon";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 const currencyFormatter = new Intl.NumberFormat("en-IN", {
   style: "currency",
@@ -23,7 +36,14 @@ const currencyFormatter = new Intl.NumberFormat("en-IN", {
 type SortKey = keyof Expense;
 type SortDirection = "asc" | "desc";
 
-export default function ExpensesTab({ expenses }: { expenses: Expense[] }) {
+interface ExpensesTabProps {
+  expenses: Expense[];
+  onDeleteExpense: (id: string) => void;
+  onClearAllExpenses: () => void;
+}
+
+export default function ExpensesTab({ expenses, onDeleteExpense, onClearAllExpenses }: ExpensesTabProps) {
+  const { toast } = useToast();
   const [sortConfig, setSortConfig] = React.useState<{ key: SortKey; direction: SortDirection }>({
     key: "date",
     direction: "desc",
@@ -47,10 +67,7 @@ export default function ExpensesTab({ expenses }: { expenses: Expense[] }) {
 
   const requestSort = (key: SortKey) => {
     let direction: SortDirection = "asc";
-    if (
-      sortConfig.key === key &&
-      sortConfig.direction === "asc"
-    ) {
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
       direction = "desc";
     }
     setSortConfig({ key, direction });
@@ -63,10 +80,44 @@ export default function ExpensesTab({ expenses }: { expenses: Expense[] }) {
     return sortConfig.direction === "asc" ? <ArrowUp className="ml-2 h-4 w-4 inline" /> : <ArrowDown className="ml-2 h-4 w-4 inline" />;
   };
 
+  const handleClearAll = () => {
+    onClearAllExpenses();
+    toast({
+      title: "Success",
+      description: "All transactions have been cleared.",
+    });
+  };
+
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>All Transactions</CardTitle>
+        {expenses.length > 0 && (
+           <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" size="sm">
+                <Trash2 className="mr-2 h-4 w-4" /> Erase All
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center gap-2">
+                  <ShieldAlert className="h-6 w-6 text-destructive" /> Are you absolutely sure?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete all
+                  of your transactions.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleClearAll} className="bg-destructive hover:bg-destructive/90">
+                  Yes, delete everything
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
       </CardHeader>
       <CardContent>
         <div className="rounded-md border">
@@ -83,6 +134,7 @@ export default function ExpensesTab({ expenses }: { expenses: Expense[] }) {
                 <TableHead onClick={() => requestSort("amount")} className="cursor-pointer hover:bg-muted/50 text-right">
                   <div className="flex items-center justify-end">Amount {getSortIcon("amount")}</div>
                 </TableHead>
+                <TableHead className="w-[50px] text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -100,11 +152,21 @@ export default function ExpensesTab({ expenses }: { expenses: Expense[] }) {
                     <TableCell className="text-right font-mono">
                       {currencyFormatter.format(expense.amount)}
                     </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                        onClick={() => onDeleteExpense(expense.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-24 text-center">
+                  <TableCell colSpan={5} className="h-24 text-center">
                     No expenses yet. Add one to get started!
                   </TableCell>
                 </TableRow>

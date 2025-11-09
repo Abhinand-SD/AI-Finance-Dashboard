@@ -30,6 +30,14 @@ export default function Home() {
     setIsDialogOpen(false);
   };
 
+  const deleteExpense = (id: string) => {
+    setExpenses((prev) => prev.filter((exp) => exp.id !== id));
+  };
+
+  const clearAllExpenses = () => {
+    setExpenses([]);
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-10 border-b bg-card/80 backdrop-blur-sm">
@@ -62,7 +70,11 @@ export default function Home() {
             <DashboardTab expenses={expenses} />
           </TabsContent>
           <TabsContent value="transactions" className="mt-6">
-            <ExpensesTab expenses={expenses} />
+            <ExpensesTab
+              expenses={expenses}
+              onDeleteExpense={deleteExpense}
+              onClearAllExpenses={clearAllExpenses}
+            />
           </TabsContent>
         </Tabs>
       </main>

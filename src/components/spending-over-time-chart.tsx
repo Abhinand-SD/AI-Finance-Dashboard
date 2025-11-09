@@ -22,6 +22,12 @@ const chartConfig = {
     total: { label: "Total Spend", color: "hsl(var(--primary))" },
 } satisfies ChartConfig;
 
+const currencyFormatter = new Intl.NumberFormat("en-IN", {
+  style: "currency",
+  currency: "INR",
+  minimumFractionDigits: 0,
+});
+
 export function SpendingOverTimeChart({ expenses }: { expenses: Expense[] }) {
     const data = React.useMemo(() => {
         const thirtyDaysAgo = subDays(new Date(), 29);
@@ -54,8 +60,14 @@ export function SpendingOverTimeChart({ expenses }: { expenses: Expense[] }) {
                     <LineChart accessibilityLayer data={data} margin={{ top: 5, right: 20, left: 10, bottom: 0 }}>
                         <CartesianGrid vertical={false} />
                         <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} fontSize={12} stroke="hsl(var(--muted-foreground))" />
-                        <YAxis tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => `$${value}`} fontSize={12} stroke="hsl(var(--muted-foreground))" />
-                        <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+                        <YAxis tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => currencyFormatter.format(value).replace(/₹/g, '₹')} fontSize={12} stroke="hsl(var(--muted-foreground))" />
+                        <ChartTooltip 
+                            cursor={false} 
+                            content={<ChartTooltipContent 
+                                hideLabel 
+                                formatter={(value) => currencyFormatter.format(value as number)}
+                            />} 
+                        />
                         <Line dataKey="total" type="monotone" stroke="var(--color-total)" strokeWidth={2} dot={true} />
                     </LineChart>
                 </ChartContainer>
