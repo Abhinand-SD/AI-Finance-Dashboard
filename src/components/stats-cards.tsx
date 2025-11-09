@@ -4,9 +4,9 @@ import { useMemo } from 'react';
 import type { Expense } from '@/lib/types';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
-const currencyFormatter = new Intl.NumberFormat("en-US", {
+const currencyFormatter = new Intl.NumberFormat("en-IN", {
   style: "currency",
-  currency: "USD",
+  currency: "INR",
 });
 
 export function StatsCards({ expenses }: { expenses: Expense[] }) {
