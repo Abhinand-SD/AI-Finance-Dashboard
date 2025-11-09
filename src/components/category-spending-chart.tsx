@@ -55,6 +55,15 @@ export function CategorySpendingChart({ expenses }: { expenses: Expense[] }) {
       .sort((a, b) => b.value - a.value);
   }, [expenses]);
 
+  const totalSpend = React.useMemo(() => {
+    return data.reduce((acc, curr) => acc + curr.value, 0);
+  }, [data]);
+  
+  const currencyFormatter = new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+  });
+
   return (
     <Card>
       <CardHeader>
@@ -75,37 +84,11 @@ export function CategorySpendingChart({ expenses }: { expenses: Expense[] }) {
                 nameKey="name"
                 cx="50%"
                 cy="50%"
+                innerRadius={isMobile ? 30 : 40}
                 outerRadius={isMobile ? 60 : 80}
                 labelLine={false}
-                label={({
-                  cx,
-                  cy,
-                  midAngle,
-                  innerRadius,
-                  outerRadius,
-                  percent,
-                  index,
-                }) => {
-                  const RADIAN = Math.PI / 180;
-                  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-                  const x = cx + radius * Math.cos(-midAngle * RADIAN);
-                  const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-                  return (
-                    <text
-                      x={x}
-                      y={y}
-                      fill="white"
-                      textAnchor={x > cx ? 'start' : 'end'}
-                      dominantBaseline="central"
-                      className="text-xs font-bold"
-                    >
-                      {`${(percent * 100).toFixed(0)}%`}
-                    </text>
-                  );
-                }}
               >
-                {data.map((entry, index) => (
+                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.fill} />
                 ))}
               </Pie>
