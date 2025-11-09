@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { format } from 'date-fns';
 import { Sparkles, Loader2 } from "lucide-react";
 import type { Expense } from "@/lib/types";
 import { getBudgetRecommendations, BudgetRecommendationsOutput } from "@/ai/flows/budget-recommendations";
@@ -34,7 +33,7 @@ export function AIBudgetTool({ expenses }: { expenses: Expense[] }) {
             const formattedExpenses = expenses.map(e => ({
                 amount: e.amount,
                 category: e.category,
-                date: format(e.date, 'yyyy-MM-dd')
+                date: e.date.toISOString().split('T')[0] // YYYY-MM-DD
             }));
             
             const result = await getBudgetRecommendations({
