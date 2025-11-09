@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -84,8 +85,7 @@ export function CategorySpendingChart({ expenses }: { expenses: Expense[] }) {
                 nameKey="name"
                 cx="50%"
                 cy="50%"
-                innerRadius={isMobile ? 30 : 40}
-                outerRadius={isMobile ? 60 : 80}
+                outerRadius={isMobile ? 80 : 100}
                 labelLine={false}
               >
                  {data.map((entry, index) => (
