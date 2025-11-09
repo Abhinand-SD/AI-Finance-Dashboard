@@ -8,9 +8,9 @@ import { SpendingOverTimeChart } from "./spending-over-time-chart";
 
 export default function DashboardTab({ expenses }: { expenses: Expense[] }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <StatsCards expenses={expenses} />
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-4 md:gap-6 lg:grid-cols-2">
         <CategorySpendingChart expenses={expenses} />
         <SpendingOverTimeChart expenses={expenses} />
       </div>

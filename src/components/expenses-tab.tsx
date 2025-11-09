@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ArrowDown, ArrowUp, Trash2, ShieldAlert } from "lucide-react";
+import { ArrowDown, ArrowUp, Trash2, ShieldAlert, MoreVertical } from "lucide-react";
 import type { Expense } from "@/lib/types";
 import {
   Table,
@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CategoryIcon } from "@/components/category-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const currencyFormatter = new Intl.NumberFormat("en-IN", {
   style: "currency",
@@ -44,6 +51,7 @@ interface ExpensesTabProps {
 
 export default function ExpensesTab({ expenses, onDeleteExpense, onClearAllExpenses }: ExpensesTabProps) {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [sortConfig, setSortConfig] = React.useState<{ key: SortKey; direction: SortDirection }>({
     key: "date",
     direction: "desc",
@@ -88,10 +96,89 @@ export default function ExpensesTab({ expenses, onDeleteExpense, onClearAllExpen
     });
   };
 
+  if (isMobile) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">All Transactions</h2>
+            {expenses.length > 0 && (
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                    <Button variant="destructive" size="sm">
+                        <Trash2 className="mr-2 h-4 w-4" /> Erase All
+                    </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2">
+                        <ShieldAlert className="h-6 w-6 text-destructive" /> Are you sure?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                        This will permanently delete all transactions.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleClearAll} className="bg-destructive hover:bg-destructive/90">
+                        Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )}
+        </div>
+        {sortedExpenses.length > 0 ? (
+          <div className="space-y-3">
+            {sortedExpenses.map((expense) => (
+              <Card key={expense.id}>
+                <CardContent className="p-4 flex justify-between items-center">
+                  <div className="flex items-center gap-4">
+                    <CategoryIcon category={expense.category} className="h-8 w-8 text-muted-foreground" />
+                    <div className="grid gap-0.5">
+                      <p className="font-semibold">{expense.description}</p>
+                      <p className="text-sm text-muted-foreground">{expense.date.toLocaleDateString()}</p>
+                      <Badge variant="secondary" className="w-fit mt-1">{expense.category}</Badge>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <p className="font-mono text-lg">{currencyFormatter.format(expense.amount)}</p>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          className="text-destructive"
+                          onClick={() => onDeleteExpense(expense.id)}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="py-12 text-center text-muted-foreground">
+            No expenses yet. Add one to get started!
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>All Transactions</CardTitle>
+        <div>
+          <CardTitle>All Transactions</CardTitle>
+          <CardDescription>View and manage all your recorded expenses.</CardDescription>
+        </div>
         {expenses.length > 0 && (
            <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -124,14 +211,14 @@ export default function ExpensesTab({ expenses, onDeleteExpense, onClearAllExpen
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead onClick={() => requestSort("date")} className="cursor-pointer hover:bg-muted/50">
+                <TableHead onClick={() => requestSort("date")} className="cursor-pointer hover:bg-muted/50 w-[120px]">
                   <div className="flex items-center">Date {getSortIcon("date")}</div>
                 </TableHead>
-                <TableHead onClick={() => requestSort("category")} className="cursor-pointer hover:bg-muted/50">
+                <TableHead onClick={() => requestSort("category")} className="cursor-pointer hover:bg-muted/50 w-[150px]">
                   <div className="flex items-center">Category {getSortIcon("category")}</div>
                 </TableHead>
                 <TableHead>Description</TableHead>
-                <TableHead onClick={() => requestSort("amount")} className="cursor-pointer hover:bg-muted/50 text-right">
+                <TableHead onClick={() => requestSort("amount")} className="cursor-pointer hover:bg-muted/50 text-right w-[150px]">
                   <div className="flex items-center justify-end">Amount {getSortIcon("amount")}</div>
                 </TableHead>
                 <TableHead className="w-[50px] text-right">Actions</TableHead>

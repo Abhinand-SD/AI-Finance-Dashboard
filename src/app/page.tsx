@@ -16,10 +16,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AddExpenseForm } from "@/components/add-expense-form";
 import ExpensesTab from "@/components/expenses-tab";
 import DashboardTab from "@/components/dashboard-tab";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function Home() {
   const [expenses, setExpenses] = useState<Expense[]>(initialExpenses);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const addExpense = (data: ExpenseFormValues) => {
     const newExpense: Expense = {
@@ -37,27 +46,45 @@ export default function Home() {
   const clearAllExpenses = () => {
     setExpenses([]);
   };
+  
+  const addExpenseForm = <AddExpenseForm onSubmit={addExpense} />;
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-10 border-b bg-card/80 backdrop-blur-sm">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <h1 className="font-headline text-2xl font-bold text-primary">
+        <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
+          <h1 className="font-headline text-xl md:text-2xl font-bold text-primary">
             ExpenseWise
           </h1>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" /> Add Expense
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Add a new expense</DialogTitle>
-              </DialogHeader>
-              <AddExpenseForm onSubmit={addExpense} />
-            </DialogContent>
-          </Dialog>
+          {isMobile ? (
+             <Sheet open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <SheetTrigger asChild>
+                <Button size="sm">
+                  <Plus className="mr-2 h-4 w-4" /> Add
+                </Button>
+              </SheetTrigger>
+              <SheetContent>
+                <SheetHeader>
+                  <SheetTitle>Add a new expense</SheetTitle>
+                </SheetHeader>
+                <div className="mt-4">{addExpenseForm}</div>
+              </SheetContent>
+            </Sheet>
+          ) : (
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" /> Add Expense
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Add a new expense</DialogTitle>
+                </DialogHeader>
+                {addExpenseForm}
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </header>
       <main className="flex-grow container mx-auto p-4 md:p-6">
@@ -66,10 +93,10 @@ export default function Home() {
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="transactions">Transactions</TabsTrigger>
           </TabsList>
-          <TabsContent value="dashboard" className="mt-6">
+          <TabsContent value="dashboard" className="mt-4 md:mt-6">
             <DashboardTab expenses={expenses} />
           </TabsContent>
-          <TabsContent value="transactions" className="mt-6">
+          <TabsContent value="transactions" className="mt-4 md:mt-6">
             <ExpensesTab
               expenses={expenses}
               onDeleteExpense={deleteExpense}

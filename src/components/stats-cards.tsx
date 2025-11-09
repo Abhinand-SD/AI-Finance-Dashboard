@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import type { Expense } from '@/lib/types';
-import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 
 const currencyFormatter = new Intl.NumberFormat("en-IN", {
   style: "currency",
@@ -30,17 +30,17 @@ export function StatsCards({ expenses }: { expenses: Expense[] }) {
   }, [expenses]);
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
+    <div className="grid gap-4 md:gap-6 sm:grid-cols-2">
       <Card>
-          <CardHeader>
+          <CardHeader className='pb-2'>
               <CardDescription>Total Spend (This Month)</CardDescription>
-              <CardTitle className="text-4xl">{currencyFormatter.format(totalSpendCurrentMonth)}</CardTitle>
+              <CardTitle className="text-3xl md:text-4xl">{currencyFormatter.format(totalSpendCurrentMonth)}</CardTitle>
           </CardHeader>
       </Card>
       <Card>
-          <CardHeader>
+          <CardHeader className='pb-2'>
               <CardDescription>Total Transactions (This Month)</CardDescription>
-              <CardTitle className="text-4xl">{transactionsCurrentMonth}</CardTitle>
+              <CardTitle className="text-3xl md:text-4xl">{transactionsCurrentMonth}</CardTitle>
           </CardHeader>
       </Card>
     </div>

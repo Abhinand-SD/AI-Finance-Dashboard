@@ -52,8 +52,8 @@ export function AIBudgetTool({ expenses }: { expenses: Expense[] }) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <Sparkles className="text-accent h-6 w-6" />
+                <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
+                    <Sparkles className="text-accent h-5 w-5 md:h-6 md:w-6" />
                     AI Budget Advisor
                 </CardTitle>
                 <CardDescription>Get personalized savings recommendations based on your spending patterns.</CardDescription>
@@ -67,7 +67,7 @@ export function AIBudgetTool({ expenses }: { expenses: Expense[] }) {
                         onChange={(e) => setIncome(e.target.value)}
                         disabled={isLoading}
                     />
-                    <Button onClick={handleGetRecommendations} disabled={isLoading} className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                    <Button onClick={handleGetRecommendations} disabled={isLoading || !income} className="bg-accent hover:bg-accent/90 text-accent-foreground sm:w-auto w-full">
                         {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                         Get Advice
                     </Button>
