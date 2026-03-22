@@ -1,5 +1,8 @@
 {
-  "name": "nextn",
+  "name": "ai-expensewise",
+  "author": {
+    "name":"Abhinand sd"
+  },
   "version": "0.1.0",
   "private": true,
   "scripts": {
